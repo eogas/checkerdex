@@ -1,0 +1,20 @@
+{
+  "name": "checkerdex",
+  "version": "1.0",
+  "description": "Lets you know if you've been visiting certain sites too often",
+  "background": { "scripts": ["background.js"] },
+  "options_page": "options.html",
+  "page_action" :
+  {
+    "default_icon" : "icon-19.png",
+    "default_title" : "checkerdex is watching this domain"
+  },
+  "permissions" : [
+    "tabs"
+  ],
+  "icons" : {
+    "48" : "icon-48.png",
+    "128" : "icon-128.png"
+  },
+  "manifest_version": 2
+}
