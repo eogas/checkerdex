@@ -1,7 +1,8 @@
 
-var maxOut = 10;
+var maxOut = 50;
+var adjustedMax = maxOut / 10;
 var baseScore = 1;
-var range = 24;
+var range = 6;
 var rangeMS = range * 60 * 60 * 1000;
 
 // Called when the url of a tab changes.
@@ -19,14 +20,17 @@ function checkForValidUrl(tabId, changeInfo, tab) {
 			if (!dates) dates = [];
 			else dates = JSON.parse(dates);
 
+			// parse dates
+			for (var j = 0; j < dates.length; j++)
+				dates[j] = new Date(Date.parse(dates[j]));
+
 			var now = new Date();
-			now = Date.UTC(now.getYear(), now.getMonth(), now.getDay(), now.getHours(),
-				now.getMinutes(), now.getSeconds(), now.getMilliseconds());
 			dates.push(now);
 
 			for (var j = 0; j < dates.length - 1; j++)
 			{
 				var diff = now - dates[j];
+				console.log(diff);
 				if (diff > rangeMS)
 				{
 					// remove date if not in range
@@ -36,32 +40,37 @@ function checkForValidUrl(tabId, changeInfo, tab) {
 				}
 			}
 
-			localStorage[domains[i]] = JSON.stringify(dates);
-
-			var cd = checkerdex(dates).toFixed(2);
+			var cd = checkerdex(dates) / adjustedMax;
+			cd = cd.toFixed(2);
 
 			var icon, msg;
-			if (cd > maxOut) // off the scale
+			if (cd > 10) // off the scale
 			{
 				icon = 'bad.png';
 				msg = 'Off the checkerdex scale! For shame.';
-			} else if (cd > (maxOut * .8)) //bad
+			} else if (cd > 8) //bad
 			{
 				icon = 'bad.png';
-				msg = cd + ' out of ' + maxOut + ', go do some work!';
-			} else if (cd > (maxOut * .5)) //okay
+				msg = cd + ' out of 10, go do some work!';
+			} else if (cd > 5) //okay
 			{
 				icon = 'okay.png';
-				msg = cd + ' out of ' + maxOut + ', doing okay.';
+				msg = cd + ' out of 10, doing okay.';
 			} else // good
 			{
 				icon = 'good.png';
-				msg = cd + ' out of ' + maxOut + ', looking good!';
+				msg = cd + ' out of 10, looking good!';
 			}
 
 			chrome.pageAction.setIcon({tabId: tabId, path: icon});
 			chrome.pageAction.setTitle({tabId: tabId, title: msg});
 			chrome.pageAction.show(tabId);
+
+			// stringify dates
+			for (var j = 0; j < dates.length; j++)
+				dates[j] = dates[j].toString();
+
+			localStorage[domains[i]] = JSON.stringify(dates);
 
 			break;
 		}
